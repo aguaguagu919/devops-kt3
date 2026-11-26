@@ -9,7 +9,7 @@ async function get(path) {
 test('GET / returns the project title', async () => {
   const res = await get('/');
   expect(res.writeHead.mock.calls[0][0]).toBe(200);
-  expect(res.end).toHaveBeenCalledWith('KT3 App');
+  expect(res.end).toHaveBeenCalledWith('Incorrect title');
 });
 
 test('GET /health returns a JSON status', async () => {
