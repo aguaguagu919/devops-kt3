@@ -1,10 +1,25 @@
-# Приложение для КТ 3
+# КТ 3. CI/CD для приложения на Node.js
 
-    GET / возвращает KT3 App. GET /health возвращает JSON со статусом ok. Запуск без контейнера: `npm ci`, затем `npm start`. Порт по умолчанию 3000. Сборка контейнера: `docker build -t kt3-app:local .`.
+Приложение отвечает на `GET /` строкой `KT3 App`, а на `GET /health` — объектом `{"status":"ok"}`. Порт по умолчанию — 3000.
 
+## Локальный запуск
 
-    Используется Node.js 20. Для локальной проверки выполните `npm ci`, `npm run lint`, `npm test`. Для интеграционного теста задайте PGHOST, PGPORT, PGDATABASE, PGUSER и PGPASSWORD. Без PGHOST запускаются только тесты HTTP-обработчиков.
+```sh
+npm ci
+npm run lint
+npm test
+npm start
+```
 
-    Workflow проверяет push и pull_request для main и develop. Job test выполняет SQL-запрос к PostgreSQL. После успешных проверок push в main публикует ghcr.io/<владелец>/<репозиторий> с тегами latest и полным SHA коммита.
+Для интеграционного теста задайте `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER` и `PGPASSWORD`. Jest проверяет оба HTTP-маршрута и выполняет запрос `SELECT 1` к PostgreSQL.
 
-    Для размещения на GitHub нужно создать одноимённый репозиторий, отправить main и develop, включить для main обязательные проверки lint и test и требование pull request. В локальной копии Git правила платформы и публикация Packages не применяются.
+## Контейнер
+
+```sh
+docker build -t kt3-app:local .
+docker run --rm -p 127.0.0.1:3000:3000 kt3-app:local
+```
+
+## GitHub Actions
+
+Изменения проходят через pull request из `feature/kt3` в `develop`, затем из `develop` в `main`. Для обеих веток CI запускает ESLint и Jest на Node.js 20. Тесты используют сервис PostgreSQL 16. После успешных проверок push в `main` публикует образ `ghcr.io/aguaguagu919/devops-kt3` с тегами `latest` и полным SHA коммита.
